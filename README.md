@@ -1,2 +1,2 @@
 # fw_plays
-when it rians, it pours!
+when it rains, it pours!
