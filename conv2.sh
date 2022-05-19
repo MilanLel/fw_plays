@@ -11,7 +11,8 @@ do
 if [[ $host =~ [a-z][a-z][0-9][0-9] ]] ||  [[ $host =~ [a-z][a-z][a-z] ]]; then
     echo "Host=>${host}<"
 fi
-#    cat ${FILE} | awk -F ';' -v host=${host}  ' NR>1 { print " Check Line =",$1, $3, $4, $6; }' 
+done
+    cat ${FILE} | awk -F ';' -v host=${host}  ' NR>1 { print }' > /opt/fw/data/Temp_hosts.csv
      ###  split( $3, ',', orgs)
      ###  split( $3, ',', dests)
      ###  split( $3, ',', ports)
@@ -22,4 +23,4 @@ fi
      ##         }
      ##     } 
      ## }
-done
+#done
