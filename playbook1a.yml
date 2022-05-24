@@ -1,0 +1,42 @@
+#
+# ansible-playbook playbook1a.yml test 3 servers
+#
+---
+- hosts: all
+  become: true
+  pre_tasks:
+
+  - name: install updates
+    tags: always
+    yum:
+      update_only: yes
+      update_cache: yes
+
+# New section for specific servers - runner 
+
+- hosts: runner
+  become: true
+  tasks:
+
+  - name: install apache and php packages
+    tags: apache,centos,httpd
+    yum:
+      name: 
+        - httpd
+        - php
+      state: latest
+
+# New section for specific servers - welo 
+
+- hosts: welo
+  become: true
+  tasks:
+
+  - name: install apache and php packages
+    tags: apache,centos,httpd 
+    yum:
+      name: 
+        - httpd
+        - php
+      state: latest
+

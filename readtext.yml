@@ -1,0 +1,18 @@
+#
+# ansible-playbook read example.txt
+#
+---
+- name: read file example.txt
+  hosts: localhost
+  vars:
+    contents: "{{ lookup('file','/opt/fw/data/whenitrains.txt') }}"
+    var1: contents 
+# comment - print out text
+  tasks:
+  - name: print ouput on screen
+    debug:
+      msg:  "{{ contents }}"
+
+
+ 
+
