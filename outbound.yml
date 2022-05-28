@@ -1,0 +1,33 @@
+#
+# ansible-playbook outbound.yml
+# 
+
+---
+- hosts: all
+  tasks:
+
+    - name: Outbound
+      set_fact:
+        src_host: "{{ inventory_hostname }}"
+        dst_host: "{{ item.host }}"
+        dst_ports: "{{ item.ports }}"
+
+    - debug: msg=" INBOUND src_host={{ src_host }} dst_host={{ dst_host }} dst_ports={{ dst_ports|to_nice_json }}"
+
+    - name: Check port
+      wait_for:
+        host: "{{ dst_host }}"
+        port: "{{ port }}"
+        timeout: "{{ wait_for.timeout|default(5) }}"
+        state: started
+      register: v_wait_for
+      ignore_errors: true
+      loop: "{{ dst_ports }}"
+      loop_control:
+        loop_var: port
+
+    - set_fact:
+        csv: "{{ csv|default([]) + [ { 'src': src_host, 'dst': dst_host, 'port': result.port, 'descSrc': fw_desc[ src_host ]|default('na'), 'descDst': fw_desc[ dst_host ]|default('na') ,  'status': (not result.failed) } ] }}"
+      loop: "{{ v_wait_for.results }}"
+      loop_control:
+        loop_var: result

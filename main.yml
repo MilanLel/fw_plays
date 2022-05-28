@@ -1,0 +1,42 @@
+#
+# ansible-playbook main.yml
+# defaults file for audit
+---
+# tasks file for audit
+- hosts: all
+  tasks:
+
+    - name: Hostname
+      shell: hostname -f
+      register: v_host_fqdn
+
+    - debug: msg="HOSTNAME={{ v_host_fqdn }}"
+
+    - set_fact:
+        cfg: "{{ fw[ inventory_hostname ]| default('NA') }}"
+      ignore_errors: true
+
+    - set_fact:
+        inbound: "{{ cfg[ 'inbound' ] }}"
+        outbound: "{{ cfg[ 'outbound' ] }}"
+      when: cfg != 'NA'
+
+    - debug:  msg="HOSTNAME={{ v_host_fqdn.stdout }} HostPlay={{ inventory_hostname }} INBOUND={{ inbound | to_nice_json }}"
+
+    - name: "Inbound {{ inventory_hostname }}"
+      include_tasks: ./roles/audit/tasks/inbound.yml
+      loop: "{{ inbound }}"
+
+    - debug:  msg="HOSTNAME={{ v_host_fqdn.stdout }} HostPlay={{ inventory_hostname }} OUTBOUND={{ outbound | to_nice_json }}"
+
+    - name: "Outbound {{ inventory_hostname }}"
+      include_tasks: ./roles/audit/tasks/outbound.yml
+      loop: "{{ outbound }}"
+
+    - set_fact:
+        data: "{{ data|default([]) + [ item ] }}"
+      loop: "{{ csv }}"
+
+
+
+

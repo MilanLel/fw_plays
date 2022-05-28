@@ -1,0 +1,25 @@
+#
+# ansible-playbook readhost2.yml
+#
+---
+- hosts: all
+  gather_facts: no 
+
+  tasks:
+
+    - name: Print Hostname 
+      shell: ping -c1 {{ inventory_hostname }}
+      register: v_ping
+      ignore_errors: true
+      delegate_to: localhost
+
+    - debug: msg="Result v_ping={{ v_ping }}"
+
+    - debug: msg="fw={{ fw }}"
+
+    - include_tasks: ./check_port.yml
+      loop: "{{ fw }}"
+      loop_control:
+        loop_var: fw_unit
+
+

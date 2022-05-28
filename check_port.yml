@@ -1,0 +1,30 @@
+---
+ 
+    - debug: msg="FW check port  host={{ inventory_hostname }} fw_unit={{ fw_unit  }}"
+
+    - set_fact: fw_status="testable"
+
+    - set_fact:
+        fw_status: "not_testable"
+      when: fw_unit.org_ip is regex('/\\d+$')  or fw_unit.dest_ip is regex('/\\d+$') 
+#
+    - name:
+      wait_for:
+        host: "{{ fw_unit.dest_ip }}"
+        port: "{{ fw_unit.port }}"
+        state: started
+        timeout: 5
+      register: v_wait_for
+      ignore_errors: true
+      ignore_unreachable: true
+      when: fw_status is match('testable') and v_ping is success 
+#
+#    - debug: msg="NOTE id={{ fw_unit.id }} v_wait_for={{ v_wait_for }}"
+    - debug: msg="RESULT id={{ fw_unit.id }} host={{ inventory_hostname }} fw_status={{ fw_status }} org_ip={{ fw_unit.org_ip }} dest_ip={{ fw_unit.dest_ip }} port={{ fw_unit.port }}  failed={{ v_wait_for.failed|default('na') }} unreachable={{ v_ping.failed }}"
+#
+#  Next step: create csv  --- id, testable, unreachable, orgin_ip, orgin_host, dest_ip, dest_host_? ,port, port_status_failed
+#  fw_unit.id, fw_status, v_ping,   ... , *( (not v_wait_for.failed)|default('na'))
+#   
+    - set_fact:
+        csv: "{{ csv|default([]) + [ { 'id': fw_unit.id, 'status': fw_status, 'unreachable': v_ping.failed, 'org_ip': fw_unit.org_ip, 'org_host': inventory_hostname, 'dest_ip': fw_unit.dest_ip, 'port': fw_unit.port, 'port_status_failed': not v_wait_for.failed|default('na') } ] }}"
+#

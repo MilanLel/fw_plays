@@ -3,12 +3,13 @@
 #
 ---
 - hosts: all
+  gather_facts: no 
+
   tasks:
 
     - name: print ouput on screen
       shell: hostname -f
       register: v_out
       ignore_errors: true
-      ignore_unreachable: true
 
     - debug: msg="Resultat v_out={{ v_out }}"
